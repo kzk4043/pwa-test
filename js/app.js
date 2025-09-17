@@ -1,170 +1,286 @@
 // PWAテストアプリケーションのメインファイル
 // このファイルはアプリケーションの初期化と全体的な状態管理を行います
+// 主な機能：Service Worker管理、オンライン状態監視、キャッシュ制御、バックグラウンド同期
 
-// デバッグ用のログ関数
+/**
+ * デバッグ用のログ関数
+ * 全てのログメッセージに[App]プレフィックスを付けて出力
+ * 開発時やトラブルシューティング時に重要な情報を提供
+ * @param {string} message - ログに出力するメッセージ
+ */
 function log(message) {
   console.log(`[App] ${message}`);
 }
 
-// アプリケーションの状態管理
+/**
+ * アプリケーションの状態管理オブジェクト
+ * PWAの主要な状態を一箇所で管理し、他のモジュールからも参照可能
+ */
 const AppState = {
+  // Service Workerが正常に登録され、使用可能かどうか
   serviceWorkerReady: false,
+  
+  // ネットワーク接続状態（navigator.onLineの値をキャッシュ）
+  // オンライン：true、オフライン：false
   isOnline: navigator.onLine,
+  
+  // PWAインストールプロンプトイベント（beforeinstallprompt）を保持
+  // 他のファイル（install.js）で使用される可能性があるため、ここで定義
   installPromptEvent: null
 };
 
-// DOM要素の参照を保持
+/**
+ * DOM要素の参照を保持するオブジェクト
+ * getElementById()を何度も呼び出すのを避けるため、初期化時に取得して保持
+ * パフォーマンス向上とコードの可読性向上を目的とする
+ */
 const elements = {};
 
-// アプリケーションの初期化
+/**
+ * アプリケーションの初期化処理
+ * DOMが完全に読み込まれた後に実行される
+ * PWAの全ての主要機能を順序立てて初期化
+ */
 document.addEventListener('DOMContentLoaded', function() {
   log('アプリケーション初期化開始');
   
-  // DOM要素を取得
+  // STEP1: DOM要素を取得して elements オブジェクトに格納
+  // 後続の処理で頻繁に使用するDOM要素への参照を事前に取得
   initializeElements();
   
-  // Service Workerを登録
+  // STEP2: Service Workerを登録
+  // PWAの核となる機能（オフライン対応、プッシュ通知等）を有効化
   registerServiceWorker();
   
-  // イベントリスナーを設定
+  // STEP3: 各種イベントリスナーを設定
+  // オンライン/オフライン状態、ボタンクリック等のイベントハンドリング
   setupEventListeners();
   
-  // 初期状態を更新
+  // STEP4: UIの初期状態を更新
+  // Service Worker状態、オンライン状態、インストール状態を表示
   updateUI();
   
   log('アプリケーション初期化完了');
 });
 
-// DOM要素の初期化
+/**
+ * DOM要素の参照を初期化する関数
+ * index.htmlに定義されたDOM要素をJavaScriptから操作するために参照を取得
+ * この関数で取得したDOM要素は elements オブジェクトに格納され、
+ * アプリ全体で再利用される。これによりgetElementById()の呼び出し回数を減らしている。
+ */
 function initializeElements() {
-  // デバッグ情報用の要素
-  elements.swStatus = document.getElementById('swStatus');
-  elements.onlineStatus = document.getElementById('onlineStatus');
-  elements.installCheckStatus = document.getElementById('installCheckStatus');
+  // デバッグ情報表示用の要素群
+  // これらの要素はindex.htmlのデバッグ情報セクションに定義されている
+  elements.swStatus = document.getElementById('swStatus');                     // Service Workerの状態表示用スパン
+  elements.onlineStatus = document.getElementById('onlineStatus');             // オンライン/オフライン状態表示用スパン
+  elements.installCheckStatus = document.getElementById('installCheckStatus'); // インストール状態表示用スパン
   
-  // キャッシュ関連の要素
-  elements.cacheBtn = document.getElementById('cacheBtn');
-  elements.cacheStatus = document.getElementById('cacheStatus');
+  // キャッシュ機能関連の要素群
+  // ユーザーが手動でキャッシュを更新したり、状態を確認したりするための要素
+  elements.cacheBtn = document.getElementById('cacheBtn');       // キャッシュ更新ボタン
+  elements.cacheStatus = document.getElementById('cacheStatus'); // キャッシュ状態表示用パラグラフ
   
-  // バックグラウンド同期関連の要素
-  elements.syncBtn = document.getElementById('syncBtn');
-  elements.syncStatus = document.getElementById('syncStatus');
+  // バックグラウンド同期機能関連の要素群
+  // Service Workerのバックグラウンド同期機能をテストするための要素
+  elements.syncBtn = document.getElementById('syncBtn');       // バックグラウンド同期テストボタン
+  elements.syncStatus = document.getElementById('syncStatus'); // 同期状態表示用パラグラフ
   
-  log('DOM要素の取得完了');
+  log('DOM要素の取得完了 - 合計' + Object.keys(elements).length + '個の要素を管理下に置きました');
 }
 
-// Service Worker の登録
+/**
+ * Service Workerの登録と初期設定を行う関数
+ * PWAの核となる機能であるService Workerをブラウザに登録し、
+ * オフライン機能、プッシュ通知、バックグラウンド同期などを有効化する
+ * 
+ * Service Workerの状態遷移:
+ * 1. installing - インストール中
+ * 2. installed/waiting - インストール完了、アクティベート待ち
+ * 3. activating - アクティベート中
+ * 4. activated - アクティブ、使用可能
+ * 
+ * @returns {Promise<ServiceWorkerRegistration|null>} 登録成功時はServiceWorkerRegistrationオブジェクト、失敗時はnull
+ */
 async function registerServiceWorker() {
+  // ブラウザがService Workerに対応しているかチェック
+  // 古いブラウザや一部のブラウザではサポートされていない
   if ('serviceWorker' in navigator) {
     try {
-      log('Service Worker 登録中...');
+      log('Service Worker 登録中... (ファイル: /sw.js)');
       
+      // Service Workerスクリプトを登録
+      // scope: '/' はルートディレクトリ以下の全てのリクエストを制御することを意味
       const registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: '/'
+        scope: '/' // サイト全体を制御範囲とする
       });
       
-      log(`Service Worker 登録成功: ${registration.scope}`);
+      log(`Service Worker 登録成功 - スコープ: ${registration.scope}`);
+      
+      // アプリケーション状態を更新（他の機能でService Workerを使用可能になる）
       AppState.serviceWorkerReady = true;
       
-      // Service Worker の状態変化を監視
+      // Service Workerの状態変化を監視するリスナーを設定
+      // アップデートやエラーなどをユーザーに通知するため
       setupServiceWorkerListeners(registration);
       
-      // 既存の Service Worker がある場合の処理
+      // 既にアクティブなService Workerが存在する場合の処理
+      // 初回訪問時やリロード時にこの状態になる
       if (registration.active) {
-        log('アクティブな Service Worker を検出');
+        log('アクティブなService Workerを検出 - 既に動作中');
       }
       
-      // インストール待ちの Service Worker がある場合
+      // アップデートのために待機中のService Workerがある場合
+      // 新しいバージョンが利用可能だが、既存のタブが開いているため待機中
       if (registration.waiting) {
-        log('待機中の Service Worker を検出');
-        showUpdateAvailable();
+        log('待機中のService Workerを検出 - アップデートが利用可能');
+        showUpdateAvailable(); // ユーザーにアップデートを通知
       }
       
-      // 新しい Service Worker がインストール中の場合
+      // 新しいService Workerがインストール中の場合
+      // 初回訪問時やService Workerスクリプトが更新された時に発生
       if (registration.installing) {
-        log('インストール中の Service Worker を検出');
-        trackInstalling(registration.installing);
+        log('インストール中のService Workerを検出 - 進行状況を追跡開始');
+        trackInstalling(registration.installing); // インストール状態を追跡
       }
       
-      return registration;
+      return registration; // 成功時はServiceWorkerRegistrationオブジェクトを返す
       
     } catch (error) {
-      log(`Service Worker 登録エラー: ${error}`);
-      AppState.serviceWorkerReady = false;
-      return null;
+      // Service Workerの登録に失敗した場合のエラーハンドリング
+      // ネットワークエラー、スクリプトエラー、HTTPS要件不備等が原因
+      log(`Service Worker 登録エラー: ${error.message}`);
+      log('エラー詳細:', error);
+      
+      AppState.serviceWorkerReady = false; // 状態を更新し、他の機能に影響させる
+      return null; // 失敗時はnullを返す
     }
   } else {
+    // ブラウザがService Workerに対応していない場合
+    // Internet Explorer、古いバージョンのSafari等で発生
     log('Service Worker はこのブラウザでサポートされていません');
+    log('ブラウザ情報: ' + navigator.userAgent);
+    
     AppState.serviceWorkerReady = false;
     return null;
   }
 }
 
-// Service Worker のイベントリスナー設定
+/**
+ * Service Workerのイベントリスナー設定関数
+ * Service Workerのライフサイクルイベント（アップデート、状態変化等）を監視し、
+ * ユーザーに適切な通知やアクションを提供する
+ * @param {ServiceWorkerRegistration} registration - Service Workerの登録オブジェクト
+ */
 function setupServiceWorkerListeners(registration) {
-  // アップデートが見つかった場合
+  // 'updatefound'イベント: 新しいService Workerが見つかった時に発火
+  // サーバー上のsw.jsが更新されたときや、初回訪問時に発生
   registration.addEventListener('updatefound', () => {
-    log('Service Worker のアップデートを検出');
-    const newWorker = registration.installing;
-    trackInstalling(newWorker);
+    log('Service Worker のアップデートを検出 - 新しいバージョンが利用可能');
+    const newWorker = registration.installing; // インストール中のService Workerを取得
+    trackInstalling(newWorker); // インストール進行状況を追跡
   });
   
-  // Service Worker の状態変化を監視
-  let refreshing = false;
+  // 'controllerchange'イベント: アクティブなService Workerが変わった時に発火
+  // 新しいService Workerがアクティブになった時に、ページをリロードして新機能を適用
+  let refreshing = false; // 重複リロード防止フラグ
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (refreshing) return;
-    log('Service Worker が更新されました');
+    if (refreshing) return; // 既にリロード中の場合は処理をスキップ
+    log('Service Worker が更新されました - ページをリロードして新機能を適用');
     refreshing = true;
-    window.location.reload();
+    window.location.reload(); // ページ全体をリロードして新しいService Workerを使用
   });
 }
 
-// インストール中の Service Worker を追跡
+/**
+ * インストール中のService Workerの状態を追跡する関数
+ * Service Workerのインストール進行状況を監視し、完了時に適切な処理を実行
+ * @param {ServiceWorker} worker - 追跡対象のService Workerインスタンス
+ */
 function trackInstalling(worker) {
+  // Service Workerの状態変化を監視
+  // 状態: installing → installed → activating → activated
   worker.addEventListener('statechange', () => {
     log(`Service Worker 状態変化: ${worker.state}`);
+    
+    // 'installed'状態: インストール完了、アクティベート待ち
+    // この時点でユーザーにアップデートを通知する
     if (worker.state === 'installed') {
-      showUpdateAvailable();
+      showUpdateAvailable(); // アップデート利用可能の通知を表示
     }
   });
 }
 
-// アップデート利用可能の通知
+/**
+ * Service Workerアップデート利用可能の通知関数
+ * 新しいService Workerが利用可能になった時にユーザーに通知し、
+ * ユーザーの同意を得てアップデートを適用する
+ * 
+ * 実際のプロダクションでは、confirm()の代わりに、
+ * トースト通知やバナーなどのより優雅なUIを使用することを推奨
+ */
 function showUpdateAvailable() {
   log('Service Worker のアップデートが利用可能です');
   
-  // 実際のアプリケーションでは、ここでユーザーに更新の通知を表示
-  // 例: トーストメッセージやバナーなど
-  if (confirm('アプリケーションの新しいバージョンが利用可能です。更新しますか？')) {
-    // 待機中の Service Worker をアクティブ化
+  // ユーザーにアップデートの確認を求める
+  // 実際のアプリケーションでは、より上品なUI（スナックバー、モーダル等）を使用すべき
+  const shouldUpdate = confirm(
+    'アプリケーションの新しいバージョンが利用可能です。\n' +
+    '新機能やバグ修正が含まれている可能性があります。\n' +
+    '今すぐ更新しますか？'
+  );
+  
+  if (shouldUpdate) {
+    log('ユーザーがアップデートを承認 - Service Workerをアクティベート中');
+    
+    // 待機中のService Workerを取得してアクティブ化を指示
     navigator.serviceWorker.getRegistration().then(registration => {
-      if (registration.waiting) {
+      if (registration && registration.waiting) {
+        // 'SKIP_WAITING'メッセージをService Workerに送信
+        // これにより、Service Workerがself.skipWaiting()を実行し、即座にアクティブになる
         registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        log('SKIP_WAITINGメッセージをService Workerに送信しました');
+      } else {
+        log('待機中のService Workerが見つかりません');
       }
     });
+  } else {
+    log('ユーザーがアップデートを拒否 - 次回訪問時に再度通知');
   }
 }
 
-// イベントリスナーの設定
+/**
+ * アプリケーション全体のイベントリスナー設定関数
+ * ユーザーインタラクション、ブラウザイベント、システムイベントを監視し、
+ * PWAの動作を適切に制御するためのリスナーを設定
+ */
 function setupEventListeners() {
-  // オンライン/オフライン状態の変化を監視
+  // ネットワーク状態の監視を設定
+  // 'online'イベント: ネットワーク接続が復旧した時に発火
   window.addEventListener('online', handleOnlineStatusChange);
+  // 'offline'イベント: ネットワーク接続が切断された時に発火
   window.addEventListener('offline', handleOnlineStatusChange);
   
-  // キャッシュ更新ボタン
+  // キャッシュ更新ボタンのイベントリスナー設定
+  // ユーザーが手動でキャッシュを更新したい場合に使用
   if (elements.cacheBtn) {
     elements.cacheBtn.addEventListener('click', updateCache);
+    log('キャッシュ更新ボタンのリスナーを設定');
   }
   
-  // バックグラウンド同期ボタン
+  // バックグラウンド同期ボタンのイベントリスナー設定
+  // Service Workerのバックグラウンド同期機能をテストするため
   if (elements.syncBtn) {
     elements.syncBtn.addEventListener('click', requestBackgroundSync);
+    log('バックグラウンド同期ボタンのリスナーを設定');
   }
   
-  // ページの可視性変化を監視
+  // Page Visibility APIを使用したページ可視性の監視
+  // ユーザーがページを離れたり戻ってきたりした時の処理に使用
+  // パフォーマンス最適化やリアルタイムデータ更新に有効
   document.addEventListener('visibilitychange', handleVisibilityChange);
   
-  log('イベントリスナー設定完了');
+  log('イベントリスナー設定完了 - 合計3種類のイベントを監視中');
 }
 
 // オンライン状態の変化を処理

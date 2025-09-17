@@ -1,51 +1,100 @@
-// PWAインストール機能の実装
-// このファイルは beforeinstallprompt イベントを使用してカスタムインストールUIを提供します
+/**
+ * PWAインストール機能の実装
+ * このファイルは Web App Install API と beforeinstallprompt イベントを使用し、
+ * ユーザーにカスタムのUIでPWAインストール体験を提供します。
+ * 
+ * 主な機能:
+ * - beforeinstallpromptイベントのキャッチと制御
+ * - カスタムインストールボタンの提供
+ * - インストール状態の追跡と表示
+ * - iOS Safariなどの対応していないブラウザへの対応
+ */
 
-// デバッグ用のログ関数
+/**
+ * インストール機能専用のデバッグログ関数
+ * [Install]プレフィックスでインストール関連のログを区別
+ * @param {string} message - ログに出力するメッセージ
+ */
 function logInstall(message) {
   console.log(`[Install] ${message}`);
 }
 
-// インストール関連の状態管理
+/**
+ * インストール関連の状態管理オブジェクト
+ * PWAのインストール可能性、インストール状態、ブラウザサポートを管理
+ */
 const InstallState = {
+  // beforeinstallpromptイベントオブジェトを保持
+  // このイベントは一度しか発火しないため、適切なタイミングで使用できるよう保持
   promptEvent: null,
+  
+  // 現在インストールが可能かどうかのフラグ
+  // beforeinstallpromptイベントが発火しているtrueになる
   canInstall: false,
+  
+  // PWAが既にインストール済みかどうかのフラグ
+  // display-mode: standalone などで判定
   isInstalled: false,
+  
+  // ブラウザがインストール機能をサポートしているかどうか
+  // Service Worker、Notification API等のサポート状況で判定
   installSupported: false
 };
 
-// DOM要素の参照
-let installBtn = null;
-let installStatus = null;
+/**
+ * インストール関連のDOM要素への参照
+ * グローバル変数として定義し、このモジュール内の各関数からアクセス可能
+ */
+let installBtn = null;    // 「PWAをインストール」ボタンの参照
+let installStatus = null; // インストール状態表示用パラグラフの参照
 
-// インストール機能の初期化
+/**
+ * インストール機能の初期化処理
+ * DOMが読み込まれた後に実行され、インストール機能に必要な
+ * 全ての設定と初期状態チェックを実行
+ */
 document.addEventListener('DOMContentLoaded', function() {
   logInstall('インストール機能初期化開始');
   
-  // DOM要素を取得
-  installBtn = document.getElementById('installBtn');
-  installStatus = document.getElementById('installStatus');
+  // STEP1: インストールボタンと状態表示用のDOM要素を取得
+  // これらの要素はindex.htmlのインストールセクションに定義されている
+  installBtn = document.getElementById('installBtn');       // ユーザーがクリックするインストールボタン
+  installStatus = document.getElementById('installStatus'); // インストール状態を表示するテキスト要素
   
-  // イベントリスナーを設定
+  // STEP2: 各種イベントリスナーを設定
+  // beforeinstallprompt、appinstalled、クリックイベントなど
   setupInstallEventListeners();
   
-  // 初期状態をチェック
+  // STEP3: 現在のインストール状態をチェックしてUIを更新
+  // PWAが既にインストールされているか、ブラウザがサポートしているか等を判定
   checkInstallStatus();
   
   logInstall('インストール機能初期化完了');
 });
 
-// インストール関連のイベントリスナー設定
+/**
+ * インストール関連のイベントリスナー設定関数
+ * PWAインストールのライフサイクルを監視し、適切なタイミングで
+ * ユーザーにインストール体験を提供するためのリスナーを設定
+ */
 function setupInstallEventListeners() {
-  // beforeinstallprompt イベント - PWAインストール可能時に発火
+  // 'beforeinstallprompt'イベントリスナーの設定
+  // このイベントはPWAのインストール条件が満たされた時にブラウザによって発火される
+  // 条件: HTTPS、Service Worker登録、マニフェストファイル、適切なアイコンなど
   window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
   
-  // appinstalled イベント - PWAインストール完了時に発火
+  // 'appinstalled'イベントリスナーの設定
+  // このイベントはPWAが正常にインストールされた後に発火される
+  // インストール完了の確認やアナリティクス送信に使用
   window.addEventListener('appinstalled', handleAppInstalled);
   
-  // インストールボタンのクリックイベント
+  // インストールボタンのクリックイベントリスナー
+  // ユーザーがカスタムインストールボタンをクリックした時の処理
   if (installBtn) {
     installBtn.addEventListener('click', handleInstallClick);
+    logInstall('インストールボタンのクリックリスナーを設定');
+  } else {
+    logInstall('警告: インストールボタンが見つかりません (ID: installBtn)');
   }
   
   // ディスプレイモードの変化を監視

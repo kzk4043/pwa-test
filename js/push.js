@@ -1,75 +1,162 @@
-// プッシュ通知機能の実装
-// このファイルは Web Push API を使用してプッシュ通知機能を提供します
-// 注意: 実際のプッシュ通知を送信するには別途サーバーサイドの実装が必要です
+/**
+ * プッシュ通知機能の実装
+ * このファイルは Web Push API と Notification API を使用し、
+ * PWAアプリケーションにプッシュ通知機能を提供します。
+ * 
+ * 主な機能:
+ * - 通知許可の取得と管理
+ * - Push Manager サブスクリプションの作成と管理
+ * - VAPID キーを使用したサーバー認証
+ * - ローカル通知のテスト機能
+ * - iOS 16.4+ と Android のクロスプラットフォーム対応
+ * 
+ * 重要な注意事項:
+ * - 実際のプッシュ通知を送信するには別途サーバーサイドの実装が必要
+ * - VAPID キーペアの生成と管理が必要
+ * - iOS では PWA としてインストールされた場合のみ動作（iOS 16.4+）
+ */
 
-// デバッグ用のログ関数
+/**
+ * プッシュ通知機能専用のデバッグログ関数
+ * [Push]プレフィックスでプッシュ通知関連のログを区別
+ * @param {string} message - ログに出力するメッセージ
+ */
 function logPush(message) {
   console.log(`[Push] ${message}`);
 }
 
-// プッシュ通知の状態管理
+/**
+ * プッシュ通知の状態管理オブジェクト
+ * プッシュ通知のサポート状況、許可状態、サブスクリプション情報を管理
+ */
 const PushState = {
+  // ブラウザがプッシュ通知をサポートしているかどうか
+  // Service Worker、Push Manager、Notification API の全てが必要
   isSupported: false,
+  
+  // 現在の通知許可状態
+  // 'default'（未設定）、'granted'（許可）、'denied'（拒否）のいずれか
   permission: 'default',
+  
+  // 現在のプッシュサブスクリプションオブジェクト
+  // これにはendpoint、keysなどの情報が含まれ、サーバーに送信される
   subscription: null,
-  vapidPublicKey: null // 実際の実装では VAPID キーを設定
+  
+  // VAPID（Voluntary Application Server Identification）公開キー
+  // プッシュサーバーの認証に使用。実際の実装では必須
+  // 本テストでは null でも動作するが、本番環境では要設定
+  vapidPublicKey: null
 };
 
-// DOM要素の参照
-let notifyBtn = null;
-let testNotifyBtn = null;
-let notifyStatus = null;
+/**
+ * プッシュ通知関連のDOM要素への参照
+ * グローバル変数として定義し、このモジュール内の各関数からアクセス可能
+ */
+let notifyBtn = null;     // 「通知を有効化」ボタンの参照
+let testNotifyBtn = null; // 「テスト通知」ボタンの参照
+let notifyStatus = null;  // 通知状態表示用パラグラフの参照
 
-// プッシュ通知機能の初期化
+/**
+ * プッシュ通知機能の初期化処理
+ * DOM読み込み後に実行され、プッシュ通知機能に必要な
+ * 全ての設定と初期状態チェックを実行
+ */
 document.addEventListener('DOMContentLoaded', function() {
   logPush('プッシュ通知機能初期化開始');
   
-  // DOM要素を取得
-  notifyBtn = document.getElementById('notifyBtn');
-  testNotifyBtn = document.getElementById('testNotifyBtn');
-  notifyStatus = document.getElementById('notifyStatus');
+  // STEP1: プッシュ通知関連のDOM要素を取得
+  // これらの要素はindex.htmlのプッシュ通知セクションに定義されている
+  notifyBtn = document.getElementById('notifyBtn');         // 通知許可を求めるボタン
+  testNotifyBtn = document.getElementById('testNotifyBtn'); // ローカルテスト通知を送信するボタン
+  notifyStatus = document.getElementById('notifyStatus');   // 通知状態を表示するテキスト要素
   
-  // プッシュ通知のサポート状況をチェック
+  // STEP2: ブラウザのプッシュ通知サポート状況をチェック
+  // Service Worker、Push Manager、Notification APIの全てが必要
   checkPushSupport();
   
-  // イベントリスナーを設定
+  // STEP3: ボタンクリックなどのイベントリスナーを設定
   setupPushEventListeners();
   
-  // 既存のサブスクリプションをチェック
+  // STEP4: 既に作成済みのサブスクリプションがあるかチェック
+  // ページリロード時に既存の設定を復元するため
   checkExistingSubscription();
   
   logPush('プッシュ通知機能初期化完了');
 });
 
-// プッシュ通知サポート状況のチェック
+/**
+ * プッシュ通知サポート状況のチェック関数
+ * ブラウザがプッシュ通知機能をサポートしているかを確認
+ * 必要なAPI（Service Worker、Push Manager、Notification API）の存在をチェック
+ * 
+ * チェック項目:
+ * 1. Service Worker API - PWAのバックグラウンド処理に必要
+ * 2. Push Manager API - プッシュサブスクリプション管理に必要
+ * 3. Notification API - 通知の表示に必要
+ */
 function checkPushSupport() {
-  // Service Worker サポートをチェック
+  logPush('プッシュ通知サポート状況をチェック中...');
+  
+  // Service Worker API のサポートチェック
+  // PWAの核となる機能で、プッシュ通知の受信処理に必須
   if (!('serviceWorker' in navigator)) {
-    logPush('Service Worker がサポートされていません');
+    logPush('⚠️ Service Worker がサポートされていません');
+    logPush('ブラウザ: ' + navigator.userAgent);
     PushState.isSupported = false;
     return;
   }
   
-  // Push Manager サポートをチェック
+  // Push Manager API のサポートチェック
+  // プッシュサブスクリプションの作成・管理に必要
   if (!('PushManager' in window)) {
-    logPush('Push Manager がサポートされていません');
+    logPush('⚠️ Push Manager がサポートされていません');
+    logPush('このブラウザではプッシュ通知を受信できません');
     PushState.isSupported = false;
     return;
   }
   
-  // Notification API サポートをチェック
+  // Notification API のサポートチェック
+  // ユーザーに対する通知表示に必要
   if (!('Notification' in window)) {
-    logPush('Notification API がサポートされていません');
+    logPush('⚠️ Notification API がサポートされていません');
+    logPush('このブラウザでは通知を表示できません');
     PushState.isSupported = false;
     return;
   }
   
+  // 全てのAPIがサポートされている場合
   PushState.isSupported = true;
-  PushState.permission = Notification.permission;
-  logPush(`プッシュ通知サポート状況: ${PushState.isSupported}`);
+  PushState.permission = Notification.permission; // 現在の通知許可状態を取得
+  
+  logPush('✅ プッシュ通知サポート確認完了');
+  logPush(`サポート状況: ${PushState.isSupported}`);
   logPush(`現在の通知許可状態: ${PushState.permission}`);
   
+  // iOS 特有の制限をチェック
+  checkiOSLimitations();
+  
+  // UIを更新してサポート状況を反映
   updatePushUI();
+}
+
+/**
+ * iOS特有のプッシュ通知制限をチェックする関数
+ * iOS 16.4以降でサポートされたが、PWAとしてインストール済みの場合のみ動作
+ */
+function checkiOSLimitations() {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  
+  if (isIOS) {
+    logPush('iOSデバイスを検出');
+    
+    if (!isStandalone) {
+      logPush('⚠️ iOSではプッシュ通知はPWAとしてインストールされた場合のみ動作します');
+      logPush('現在はSafariブラウザで実行中のため、プッシュ通知は利用できません');
+    } else {
+      logPush('✅ PWAモードで実行中 - iOSでもプッシュ通知が利用可能です');
+    }
+  }
 }
 
 // プッシュ通知関連のイベントリスナー設定
