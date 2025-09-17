@@ -1,32 +1,39 @@
-PLACEHOLDER: icon-512x512.png
+プレースホルダー: icon-512x512.png
 
-Required Specifications:
-- Size: 512x512 pixels
-- Format: PNG
-- Purpose: maskable any
-- Color depth: 24-bit or 32-bit (with transparency)
+必要仕様:
+- サイズ: 512x512 ピクセル
+- 形式: PNG
+- 用途: maskable any
+- 色深度: 24ビットまたは32ビット（透明度付き）
 
-Design Guidelines:
-- This is the largest and highest quality icon size for PWAs
-- Used for splash screens, app stores, and the highest resolution displays
-- Design should be extremely detailed and pixel-perfect
-- Ensure the icon works well with rounded corners and masks
-- For "maskable any" purpose, the central 80% of the icon should contain the important visual elements
-- The outer 20% (safe zone) may be cropped by the system
-- Use solid background or ensure transparency works well with various backgrounds
-- Consider the theme color (#2196F3) and background color (#ffffff) from manifest.json
-- This is often the master icon from which all other sizes are generated
+重要な注意:
+- これは最高品質のマスターアイコンです
+- すべてのサイズのベースとなる重要なアイコンです
+- 最高の詳細度と品質が求められます
 
-Recommended Tools:
+デザインガイドライン:
+- このサイズから他のすべてのサイズを縮小して作成することを推奨します
+- 最高解像度での表示に対応します
+- ベクターデザインから出力することが理想的です
+- システムマスクと丸角との互換性を確保してください
+- 80%セーフゾーンの「maskable any」デザインパターンに従ってください
+- 外側20%のボーダーはオペレーティングシステムによって切り抜かれる可能性があります
+- 異なる背景色に対してもデザインが適切に動作するようにしてください
+- アプリのテーマカラー（#2196F3）と背景（#ffffff）を考慮してください
+
+推奨ツール:
 - Adobe Illustrator/Photoshop
 - Figma
-- GIMP (free alternative)
-- Online PWA icon generators
+- GIMP（無料の代替ツール）
+- オンラインPWAアイコンジェネレーター
 
-To create the actual icon:
-1. Create the icon at this size (512x512 pixels) as the master version
-2. Use vector graphics when possible for best scaling results
-3. Save as PNG with transparency support
-4. Test the icon with different background colors and masks
-5. Use this master version to generate all smaller icon sizes
-6. Replace this placeholder file with the actual icon-512x512.png
+実際のアイコンを作成するには:
+1. このサイズを最初に作成することを強く推奨します（マスターアイコン）
+2. ベクター形式（SVG、AI）でデザインする
+3. 512x512ピクセルでエクスポートする
+4. 透明度対応PNGとしてエクスポートする
+5. 様々な背景色とマスクでテストする
+6. このプレースホルダーをicon-512x512.pngと置き換える
+7. このマスターアイコンから他のサイズを作成する
+
+注意: このアイコンが完成したら、これをベースに他のサイズを縮小して作成してください

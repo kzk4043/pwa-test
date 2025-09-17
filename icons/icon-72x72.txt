@@ -1,29 +1,29 @@
-PLACEHOLDER: icon-72x72.png
+プレースホルダー: icon-72x72.png
 
-Required Specifications:
-- Size: 72x72 pixels
-- Format: PNG
-- Purpose: maskable any
-- Color depth: 24-bit or 32-bit (with transparency)
+必要仕様:
+- サイズ: 72x72 ピクセル
+- 形式: PNG
+- 用途: maskable any
+- 色深度: 24ビットまたは32ビット（透明度付き）
 
-Design Guidelines:
-- This size is typically used for app icons on Android devices
-- Design should be simple and recognizable at small sizes
-- Ensure the icon works well with rounded corners and masks
-- For "maskable any" purpose, the central 80% of the icon should contain the important visual elements
-- The outer 20% (safe zone) may be cropped by the system
-- Use solid background or ensure transparency works well with various backgrounds
-- Consider the theme color (#2196F3) and background color (#ffffff) from manifest.json
+デザインガイドライン:
+- このサイズは通常Androidデバイスのアプリアイコンに使用されます
+- 小さなサイズでも認識しやすいシンプルなデザインにする必要があります
+- 丸角やマスクでも正常に動作するアイコンを確保してください
+- "maskable any"用途のため、アイコンの中央80%に重要な視覚要素を配置する必要があります
+- 外側20%（セーフゾーン）はシステムによって切り抜かれる可能性があります
+- ソリッド背景を使用するか、様々な背景で透明度が適切に動作することを確保してください
+- manifest.jsonのテーマカラー（#2196F3）と背景色（#ffffff）を考慮してください
 
-Recommended Tools:
+推奨ツール:
 - Adobe Illustrator/Photoshop
 - Figma
-- GIMP (free alternative)
-- Online PWA icon generators
+- GIMP（無料の代替ツール）
+- オンラインPWAアイコンジェネレーター
 
-To create the actual icon:
-1. Design the icon at a larger size (512x512 or higher) for better quality
-2. Scale down to 72x72 pixels
-3. Save as PNG with transparency support
-4. Test the icon with different background colors and masks
-5. Replace this placeholder file with the actual icon-72x72.png
+実際のアイコンを作成するには:
+1. より良い品質のため、大きなサイズ（512x512以上）でアイコンをデザインする
+2. 72x72ピクセルに縮小する
+3. 透明度対応PNGとして保存する
+4. 異なる背景色とマスクでアイコンをテストする
+5. このプレースホルダーファイルを実際のicon-72x72.pngと置き換える

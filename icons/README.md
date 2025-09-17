@@ -1,83 +1,83 @@
-# PWA Icons Directory
+# PWAアイコンディレクトリ
 
-This directory contains the app icons for the "PWA機能テストアプリ" Progressive Web Application.
+このディレクトリには「PWA機能テストアプリ」のPWAアイコンが含まれます。
 
-## Icon Requirements
+## アイコン要件
 
-Based on the `manifest.json` configuration, this PWA requires the following icon sizes:
+`manifest.json`の設定に基づき、このPWAには以下のアイコンサイズが必要です：
 
-| Size | File Name | Usage |
-|------|-----------|-------|
-| 72x72 | `icon-72x72.png` | Small app icons (Android) |
-| 96x96 | `icon-96x96.png` | Medium app icons (Android) |
-| 128x128 | `icon-128x128.png` | Medium-large app icons |
-| 144x144 | `icon-144x144.png` | High-DPI app icons |
-| 152x152 | `icon-152x152.png` | iOS and high-resolution displays |
-| 192x192 | `icon-192x192.png` | **Minimum required size for PWAs** |
-| 384x384 | `icon-384x384.png` | Large displays and splash screens |
-| 512x512 | `icon-512x512.png` | **Highest quality / Master icon** |
+| サイズ | ファイル名 | 用途 |
+|------|-----------|------|
+| 72x72 | `icon-72x72.png` | 小型アプリアイコン（Android） |
+| 96x96 | `icon-96x96.png` | 中型アプリアイコン（Android） |
+| 128x128 | `icon-128x128.png` | 中〜大型アプリアイコン |
+| 144x144 | `icon-144x144.png` | 高DPIアプリアイコン |
+| 152x152 | `icon-152x152.png` | iOS・高解像度ディスプレイ用 |
+| 192x192 | `icon-192x192.png` | **PWA必須最小サイズ** |
+| 384x384 | `icon-384x384.png` | 大型ディスプレイ・スプラッシュ画面用 |
+| 512x512 | `icon-512x512.png` | **最高品質・マスターアイコン** |
 
-## Design Specifications
+## デザイン仕様
 
-### Technical Requirements
-- **Format**: PNG with transparency support
-- **Color depth**: 24-bit or 32-bit
-- **Purpose**: `maskable any` (supports adaptive icons)
-- **Theme color**: #2196F3 (Material Blue)
-- **Background color**: #ffffff (White)
+### 技術要件
+- **形式**: 透明度対応PNG
+- **色深度**: 24ビットまたは32ビット
+- **用途**: `maskable any`（アダプティブアイコン対応）
+- **テーマカラー**: #2196F3（マテリアルブルー）
+- **背景色**: #ffffff（白）
 
-### Maskable Icon Guidelines
-All icons are configured with `"purpose": "maskable any"`, which means they should follow maskable icon design principles:
+### マスカブルアイコンガイドライン
+すべてのアイコンは`"purpose": "maskable any"`で設定されており、マスカブルアイコンデザイン原則に従う必要があります：
 
-1. **Safe Zone**: Keep important visual elements within the central 80% of the icon
-2. **Bleed Area**: The outer 20% may be cropped by the system when applying masks
-3. **Background**: Use a solid background color or design that works with transparency
-4. **Testing**: Test icons with various masks and background colors
+1. **セーフゾーン**: 重要な視覚要素をアイコンの中央80%内に配置
+2. **ブリード領域**: 外側20%はシステムがマスク適用時に切り抜く可能性がある
+3. **背景**: 単色背景または透明度で動作するデザインを使用
+4. **テスト**: 様々なマスクと背景色でアイコンをテスト
 
-### Design Best Practices
-- **Simplicity**: Keep the design simple and recognizable at small sizes
-- **Contrast**: Ensure good contrast against both light and dark backgrounds
-- **Consistency**: Maintain visual consistency across all sizes
-- **Scalability**: Start with the 512x512 master icon and scale down
-- **Brand Alignment**: Follow the app's color scheme and branding
+### デザインベストプラクティス
+- **シンプルさ**: 小さなサイズでも認識しやすいシンプルなデザイン
+- **コントラスト**: 明暗両方の背景に対して十分なコントラスト確保
+- **一貫性**: すべてのサイズで視覚的一貫性を維持
+- **拡張性**: 512x512マスターアイコンから開始して縮小
+- **ブランド整合性**: アプリの配色とブランドに準拠
 
-## Creation Workflow
+## 作成ワークフロー
 
-1. **Design Master Icon**: Create the 512x512 pixel version first
-2. **Use Vector Graphics**: Design in vector format (SVG, AI) for best scaling
-3. **Generate Sizes**: Scale down to create all required sizes
-4. **Test Maskable**: Verify icons work with different masks and backgrounds
-5. **Optimize**: Compress PNG files for web performance
-6. **Replace Placeholders**: Replace the `.txt` placeholder files with actual `.png` icons
+1. **マスターアイコン作成**: まず512x512ピクセル版を作成
+2. **ベクター形式使用**: 最良のスケーリングのためベクター形式（SVG、AI）でデザイン
+3. **サイズ展開**: 縮小して必要な全サイズを作成
+4. **マスカブルテスト**: 異なるマスクと背景でアイコンが動作するか確認
+5. **最適化**: Web パフォーマンスのためPNGファイルを圧縮
+6. **置換**: `.txt`プレースホルダーファイルを実際の`.png`アイコンと置換
 
-## Tools and Resources
+## ツールとリソース
 
-### Design Tools
-- **Adobe Illustrator/Photoshop**: Professional design tools
-- **Figma**: Free web-based design tool
-- **GIMP**: Free open-source alternative
-- **Canva**: Simple online design tool
+### デザインツール
+- **Adobe Illustrator/Photoshop**: プロフェッショナルデザインツール
+- **Figma**: 無料のWebベースデザインツール
+- **GIMP**: 無料オープンソース代替ツール
+- **Canva**: シンプルなオンラインデザインツール
 
-### PWA Icon Generators
+### PWAアイコンジェネレーター
 - **PWA Asset Generator**: https://github.com/pwa-builder/PWABuilder
 - **Favicon Generator**: https://realfavicongenerator.net/
 - **App Icon Generator**: https://www.appicon.co/
 
-### Testing Tools
-- **Maskable.app**: https://maskable.app/ (Test maskable icons)
-- **PWA Builder**: https://www.pwabuilder.com/ (PWA validation)
-- **Lighthouse**: Chrome DevTools PWA audit
+### テストツール
+- **Maskable.app**: https://maskable.app/ （マスカブルアイコンテスト）
+- **PWA Builder**: https://www.pwabuilder.com/ （PWA検証）
+- **Lighthouse**: Chrome DevTools PWA監査
 
-## Current Status
+## 現在のステータス
 
-Currently, this directory contains placeholder `.txt` files for each required icon size. These files contain detailed specifications and guidelines for creating the actual PNG icons.
+現在、このディレクトリには各必要アイコンサイズのプレースホルダー`.txt`ファイルが含まれています。これらのファイルには実際のPNGアイコンを作成するための詳細な仕様とガイドラインが含まれています。
 
-**Next Steps:**
-1. Design and create the actual PNG icon files
-2. Replace the placeholder `.txt` files with the corresponding `.png` files
-3. Test the icons using the tools mentioned above
-4. Validate the PWA manifest and icon implementation
+**次のステップ**:
+1. 実際のPNGアイコンファイルの設計・作成
+2. プレースホルダー`.txt`ファイルを対応する`.png`ファイルと置換
+3. 上記ツールを使用したアイコンテスト
+4. PWAマニフェストとアイコン実装の検証
 
-## Shortcuts Integration
+## ショートカット連携
 
-The 192x192 icon is also used for the app shortcut "インストールテスト" (Install Test) as defined in the manifest.json shortcuts section.
+192x192アイコンは、manifest.jsonのショートカットセクションで定義されている「インストールテスト」アプリショートカットでも使用されます。

@@ -1,29 +1,29 @@
-PLACEHOLDER: icon-128x128.png
+プレースホルダー: icon-128x128.png
 
-Required Specifications:
-- Size: 128x128 pixels
-- Format: PNG
-- Purpose: maskable any
-- Color depth: 24-bit or 32-bit (with transparency)
+必要仕様:
+- サイズ: 128x128 ピクセル
+- 形式: PNG
+- 用途: maskable any
+- 色深度: 24ビットまたは32ビット（透明度付き）
 
-Design Guidelines:
-- This size is used for app icons and provides good detail visibility
-- Design should be clear with sufficient detail for medium-large sizes
-- Ensure the icon works well with rounded corners and masks
-- For "maskable any" purpose, the central 80% of the icon should contain the important visual elements
-- The outer 20% (safe zone) may be cropped by the system
-- Use solid background or ensure transparency works well with various backgrounds
-- Consider the theme color (#2196F3) and background color (#ffffff) from manifest.json
+デザインガイドライン:
+- このサイズは中〜大型のアプリアイコンに使用されます
+- 詳細が見やすい適度なサイズです
+- システムマスクと丸角との互換性を確保してください
+- 80%セーフゾーンの「maskable any」デザインパターンに従ってください
+- 外側20%のボーダーはオペレーティングシステムによって切り抜かれる可能性があります
+- 異なる背景色に対してもデザインが適切に動作するようにしてください
+- アプリのテーマカラー（#2196F3）と背景（#ffffff）を考慮してください
 
-Recommended Tools:
+推奨ツール:
 - Adobe Illustrator/Photoshop
 - Figma
-- GIMP (free alternative)
-- Online PWA icon generators
+- GIMP（無料の代替ツール）
+- オンラインPWAアイコンジェネレーター
 
-To create the actual icon:
-1. Design the icon at a larger size (512x512 or higher) for better quality
-2. Scale down to 128x128 pixels
-3. Save as PNG with transparency support
-4. Test the icon with different background colors and masks
-5. Replace this placeholder file with the actual icon-128x128.png
+実際のアイコンを作成するには:
+1. より良い品質のため高解像度（512x512以上）でデザインする
+2. 128x128ピクセルに縮小する
+3. 透明度対応PNGとしてエクスポートする
+4. 様々な背景色とマスクでテストする
+5. このプレースホルダーをicon-128x128.pngと置き換える

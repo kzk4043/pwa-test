@@ -1,31 +1,36 @@
-PLACEHOLDER: icon-192x192.png
+プレースホルダー: icon-192x192.png
 
-Required Specifications:
-- Size: 192x192 pixels
-- Format: PNG
-- Purpose: maskable any
-- Color depth: 24-bit or 32-bit (with transparency)
+必要仕様:
+- サイズ: 192x192 ピクセル
+- 形式: PNG
+- 用途: maskable any
+- 色深度: 24ビットまたは32ビット（透明度付き）
 
-Design Guidelines:
-- This is one of the most important icon sizes for PWAs (minimum recommended size)
-- Used for app icons, shortcuts, and various system contexts
-- Design should be highly detailed and clear at large sizes
-- Ensure the icon works well with rounded corners and masks
-- For "maskable any" purpose, the central 80% of the icon should contain the important visual elements
-- The outer 20% (safe zone) may be cropped by the system
-- Use solid background or ensure transparency works well with various backgrounds
-- Consider the theme color (#2196F3) and background color (#ffffff) from manifest.json
-- This icon is also used for the shortcut "インストールテスト" in the manifest
+重要な注意:
+- これはPWAに必要な最小サイズです
+- アプリショートカット機能でも使用されます
+- PWAとして認識されるための必須要件です
 
-Recommended Tools:
+デザインガイドライン:
+- PWAの標準アイコンサイズとして最も重要です
+- 詳細な表示が可能で、ブランドの特徴を表現できます
+- システムマスクと丸角との互換性を確保してください
+- 80%セーフゾーンの「maskable any」デザインパターンに従ってください
+- 外側20%のボーダーはオペレーティングシステムによって切り抜かれる可能性があります
+- 異なる背景色に対してもデザインが適切に動作するようにしてください
+- アプリのテーマカラー（#2196F3）と背景（#ffffff）を考慮してください
+
+推奨ツール:
 - Adobe Illustrator/Photoshop
 - Figma
-- GIMP (free alternative)
-- Online PWA icon generators
+- GIMP（無料の代替ツール）
+- オンラインPWAアイコンジェネレーター
 
-To create the actual icon:
-1. Design the icon at a larger size (512x512 or higher) for better quality
-2. Scale down to 192x192 pixels
-3. Save as PNG with transparency support
-4. Test the icon with different background colors and masks
-5. Replace this placeholder file with the actual icon-192x192.png
+実際のアイコンを作成するには:
+1. より良い品質のため高解像度（512x512以上）でデザインする
+2. 192x192ピクセルに縮小する
+3. 透明度対応PNGとしてエクスポートする
+4. 様々な背景色とマスクでテストする
+5. このプレースホルダーをicon-192x192.pngと置き換える
+
+注意: このアイコンはmanifest.jsonのショートカット機能でも参照されます
