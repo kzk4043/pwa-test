@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PWA機能テスト</title>
+  
+  <!-- PWA設定 -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2196F3">
+  
+  <!-- iOS向け設定 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="PWAテスト">
+  
+  <!-- スタイルシート -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main>
+    <h1>PWA機能テスト</h1>
+    <p>Android端末でのPWA機能動作確認用サイト</p>
+
+    <!-- インストール機能 -->
+    <section>
+      <h2>インストール</h2>
+      <button id="installBtn" disabled>PWAをインストール</button>
+      <p id="installStatus">ステータス: 未インストール</p>
+    </section>
+
+    <!-- プッシュ通知機能 -->
+    <section>
+      <h2>プッシュ通知</h2>
+      <button id="notifyBtn">通知を有効化</button>
+      <button id="testNotifyBtn" disabled>テスト通知</button>
+      <p id="notifyStatus">ステータス: 未設定</p>
+    </section>
+
+    <!-- オフライン機能 -->
+    <section>
+      <h2>オフライン</h2>
+      <button id="cacheBtn">キャッシュ更新</button>
+      <p id="cacheStatus">ステータス: -</p>
+    </section>
+
+    <!-- バックグラウンド同期 -->
+    <section>
+      <h2>バックグラウンド同期</h2>
+      <button id="syncBtn">同期テスト</button>
+      <p id="syncStatus">ステータス: -</p>
+    </section>
+
+    <!-- デバッグ情報 -->
+    <section>
+      <h2>デバッグ情報</h2>
+      <div id="debugInfo">
+        <p>Service Worker: <span id="swStatus">確認中...</span></p>
+        <p>オンライン状態: <span id="onlineStatus">確認中...</span></p>
+        <p>インストール状態: <span id="installCheckStatus">確認中...</span></p>
+      </div>
+    </section>
+  </main>
+
+  <!-- JavaScript読み込み -->
+  <script src="js/app.js"></script>
+  <script src="js/install.js"></script>
+  <script src="js/push.js"></script>
+</body>
+</html>

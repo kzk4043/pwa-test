@@ -1,0 +1,32 @@
+PLACEHOLDER: icon-512x512.png
+
+Required Specifications:
+- Size: 512x512 pixels
+- Format: PNG
+- Purpose: maskable any
+- Color depth: 24-bit or 32-bit (with transparency)
+
+Design Guidelines:
+- This is the largest and highest quality icon size for PWAs
+- Used for splash screens, app stores, and the highest resolution displays
+- Design should be extremely detailed and pixel-perfect
+- Ensure the icon works well with rounded corners and masks
+- For "maskable any" purpose, the central 80% of the icon should contain the important visual elements
+- The outer 20% (safe zone) may be cropped by the system
+- Use solid background or ensure transparency works well with various backgrounds
+- Consider the theme color (#2196F3) and background color (#ffffff) from manifest.json
+- This is often the master icon from which all other sizes are generated
+
+Recommended Tools:
+- Adobe Illustrator/Photoshop
+- Figma
+- GIMP (free alternative)
+- Online PWA icon generators
+
+To create the actual icon:
+1. Create the icon at this size (512x512 pixels) as the master version
+2. Use vector graphics when possible for best scaling results
+3. Save as PNG with transparency support
+4. Test the icon with different background colors and masks
+5. Use this master version to generate all smaller icon sizes
+6. Replace this placeholder file with the actual icon-512x512.png

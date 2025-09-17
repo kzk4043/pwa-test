@@ -1,0 +1,29 @@
+PLACEHOLDER: icon-72x72.png
+
+Required Specifications:
+- Size: 72x72 pixels
+- Format: PNG
+- Purpose: maskable any
+- Color depth: 24-bit or 32-bit (with transparency)
+
+Design Guidelines:
+- This size is typically used for app icons on Android devices
+- Design should be simple and recognizable at small sizes
+- Ensure the icon works well with rounded corners and masks
+- For "maskable any" purpose, the central 80% of the icon should contain the important visual elements
+- The outer 20% (safe zone) may be cropped by the system
+- Use solid background or ensure transparency works well with various backgrounds
+- Consider the theme color (#2196F3) and background color (#ffffff) from manifest.json
+
+Recommended Tools:
+- Adobe Illustrator/Photoshop
+- Figma
+- GIMP (free alternative)
+- Online PWA icon generators
+
+To create the actual icon:
+1. Design the icon at a larger size (512x512 or higher) for better quality
+2. Scale down to 72x72 pixels
+3. Save as PNG with transparency support
+4. Test the icon with different background colors and masks
+5. Replace this placeholder file with the actual icon-72x72.png
