@@ -5,21 +5,21 @@
 // キャッシュ名とバージョン管理
 // バージョンを変更することでキャッシュを更新できます
 const CACHE_NAME = 'pwa-test-cache-v1';
-const OFFLINE_URL = '/offline.html';
+const OFFLINE_URL = '/pwa-test/offline.html';
 
 // 事前にキャッシュするリソース一覧
 // これらのファイルは Service Worker インストール時にキャッシュされます
 const CACHE_RESOURCES = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/offline.html',
-  '/css/style.css',
-  '/js/app.js',
-  '/js/install.js',
-  '/js/push.js',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  '/pwa-test/',
+  '/pwa-test/index.html',
+  '/pwa-test/manifest.json',
+  '/pwa-test/offline.html',
+  '/pwa-test/css/style.css',
+  '/pwa-test/js/app.js',
+  '/pwa-test/js/install.js',
+  '/pwa-test/js/push.js',
+  '/pwa-test/icons/icon-192x192.png',
+  '/pwa-test/icons/icon-512x512.png'
 ];
 
 // デバッグ用のログ関数

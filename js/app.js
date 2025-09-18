@@ -110,9 +110,9 @@ async function registerServiceWorker() {
       log('Service Worker 登録中... (ファイル: /sw.js)');
       
       // Service Workerスクリプトを登録
-      // scope: '/' はルートディレクトリ以下の全てのリクエストを制御することを意味
-      const registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: '/' // サイト全体を制御範囲とする
+      // scope: '/pwa-test/' はサブディレクトリ以下の全てのリクエストを制御することを意味
+      const registration = await navigator.serviceWorker.register('/pwa-test/sw.js', {
+        scope: '/pwa-test/' // GitHub Pagesのサブディレクトリを制御範囲とする
       });
       
       log(`Service Worker 登録成功 - スコープ: ${registration.scope}`);

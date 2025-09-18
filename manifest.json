@@ -2,7 +2,7 @@
   "name": "PWA機能テストアプリ",
   "short_name": "PWAテスト",
   "description": "PWAの主要機能をテストするためのアプリケーション",
-  "start_url": "/",
+  "start_url": "/pwa-test/",
   "display": "standalone",
   "orientation": "portrait",
   "theme_color": "#2196F3",
